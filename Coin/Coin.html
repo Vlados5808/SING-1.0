@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clicker Game</title>
+    <link rel="stylesheet" href="style_coin.css">
+    <script src="coin.js" defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="logo">LOGO</div>
+        <nav class="nav">
+            <a href="home.html">Home</a>
+            <a href="market.html">Market</a>
+            <a href="rating.html">Rating</a>
+        </nav>
+        <div class="user-info">
+            <img src="images/avatar.jpg" alt="Avatar" class="avatar">
+            <div class="user-info-text">
+                <span class="username">Tony Stark</span>
+                <div class="coins-container">
+                    <img src="images/coin.png" alt="Currency" class="currency-icon">
+                    <span class="coins" id="coins">0
+                    </span>
+                </div>
+            </div>
+        </div>
+    </header>     
+    <main class="mainn">
+        <aside class="card">
+            <div class="upgrade-cards-container">
+                <div class="upgrade-card">
+                    <img src="images/rocket.png" alt="Upgrade" class="upgrade-card-image">
+                    <div class="upgrade-card-content">
+                        <h3 class="upgrade-card-title" name="Click Accelerator">Click Accelerator</h3>
+                        <p class="upgrade-card-info">Speed of earning x10</p>
+                        <div class="upgrade-card-price">
+                            <img src="images/coin.png" alt="Coin" class="upgrade-card-price-icon">
+                            <span>40 000</span>
+                        </div>
+                    </div>
+                    <button class="upgrade-card-button">Buy</button>
+                </div>
+                <div class="upgrade-card">
+                    <img src="images/multiplier.png" alt="Upgrade" class="upgrade-card-image">
+                    <div class="upgrade-card-content">
+                        <h3 class="upgrade-card-title" name="Coin Multiplier">Coin Multiplier</h3>
+                        <p class="upgrade-card-info">ClickCoins per click x10</p>
+                        <div class="upgrade-card-price">
+                            <img src="images/coin.png" alt="Coin" class="upgrade-card-price-icon">
+                            <span>40 000</span>
+                        </div>
+                    </div>
+                    <button class="upgrade-card-button">Buy</button>
+                </div>
+                <div class="upgrade-card">
+                    <img src="images/factor.png" alt="Upgrade" class="upgrade-card-image">
+                    <div class="upgrade-card-content">
+                        <h3 class="upgrade-card-title" name="Power Tap">Power Tap</h3>
+                        <p class="upgrade-card-info">ClickCoins per click x2</p>
+                        <div class="upgrade-card-price">
+                            <img src="images/coin.png" alt="Coin" class="upgrade-card-price-icon">
+                            <span>10 000</span>
+                        </div>
+                    </div>
+                    <button class="upgrade-card-button">Buy</button>
+                </div>
+                <div class="upgrade-card">
+                    <img src="images/present.png" alt="Upgrade" class="upgrade-card-image">
+                    <div class="upgrade-card-content">
+                        <h3 class="upgrade-card-title" name="Golden Touch">Golden Touch</h3>
+                        <p class="upgrade-card-info">random bonus on click</p>
+                        <div class="upgrade-card-price">
+                            <img src="images/coin.png" alt="Coin" class="upgrade-card-price-icon">
+                            <span>40 000</span>
+                        </div>
+                    </div>
+                    <button class="upgrade-card-button">Buy</button>
+                </div>
+                <div class="upgrade-card">
+                    <img src="images/schedule.png" alt="Upgrade" class="upgrade-card-image">
+                    <div class="upgrade-card-content">  
+                        <h3 class="upgrade-card-title" name="Coin Stream">Coin Stream</h3>
+                        <p class="upgrade-card-info">passive income x10</p>
+                        <div class="upgrade-card-price">
+                            <img src="images/coin.png" alt="Coin" class="upgrade-card-price-icon">
+                            <span>40 000</span>
+                        </div>
+                    </div>
+                    <button class="upgrade-card-button">Buy</button>
+                </div>
+                <div class="upgrade-card">
+                    <img src="images/drone.png" alt="Upgrade" class="upgrade-card-image">
+                    <div class="upgrade-card-content">
+                        <h3 class="upgrade-card-title" name="Mining Drone">Mining Drone</h3>
+                        <p class="upgrade-card-info">automated clicks for 1 min</p>
+                        <div class="upgrade-card-price">
+                            <img src="images/coin.png" alt="Coin" class="upgrade-card-price-icon">
+                            <span>100 000</span>
+                            <img src="Images/Icon Button.png" class="button-arrow"alt="">
+                        </div>
+                    </div>
+                    <button class="upgrade-card-button">Buy</button>
+                </div>
+            </div>
+        </aside>
+        <div class="mmmm">
+        <section> 
+            <div class="container">
+                <div class="large-box">
+                    <div class="box-section">   
+                        <img src="images/image1.png" class="section-image">
+                        <div class="section-text">
+                            <div class="text-large" id="totalClickCoins">0</div>
+                            <div class="text-small">Total ClickCoins</div>
+                        </div>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="box-section">
+                        <img src="images/image2.png" class="section-image">
+                        <div class="section-text">
+                            <div class="text-large">20</div>        
+                            <div class="text-small">Coins per Click</div>
+                        </div>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="box-section">
+                        <img src="images/image3.png" class="section-image">
+                        <div class="section-text">
+                            <div class="text-large">1/sec</div>
+                            <div class="text-small">Passive Income</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section> 
+        <img src="images/coin1.png" class="coin" id="clickCoin">
+        <audio id="coinSound1" src="Sounds/povezlo-povezlo.mp3"></audio>
+        <audio id="coinSound2" src="Sounds/o-privet.mp3"></audio>
+        <audio id="coinSound3" src="Sounds/otdai-salo.mp3"></audio>
+        </div>
+    </main>
+    <footer>
+        <a href="#">About game</a>
+        <a href="#">Help center</a>
+        <a href="#">Rules</a>
+    </footer>
+</body>
+</html>
