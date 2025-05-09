@@ -1,25 +1,28 @@
-document.addEventListener("DOMContentLoaded", function () {
-    document.querySelector("form").addEventListener("submit", function (event) {
-        event.preventDefault();
+function signIn(event) {
+    event.preventDefault(); 
 
-        const email = document.querySelector('input[type="email"]').value;
-        const password = document.querySelector('#password').value;
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
 
-        console.log('Email:', email);
-        console.log('Password:', password);
-        fetch('http://localhost:3000/sign-in', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                email,
-                password
-            })
-        }).then(response => {
-            return response.json()
-        }).then(data => {
-            console.log(data)
-        })
+    fetch('http://localhost:3000/sign-in', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+    })
+    .then(res => {
+        if (!res.ok) {
+            throw new Error('Invalid email or password');
+        }
+        return res.json();
+    })
+    .then(data => {
+        console.log(data); 
+        if (data.id) {
+            localStorage.setItem('userId', data.id); 
+            localStorage.setItem('userEmail', data.email); 
+            window.location.href = 'coin/coin.html';
+        } else {
+            alert('Помилка входу');
+        }
     });
-});
+}
