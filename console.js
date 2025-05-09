@@ -17,9 +17,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 password
             })
         }).then(response => {
-            return response.json()
+            return response.json();
         }).then(data => {
-            console.log(data)
-        })
+            console.log(data);
+            localStorage.setItem('userId', data.user.id);
+            localStorage.setItem('userEmail', data.user.email); 
+            window.location.href = 'coin/coin.html'; 
+        });
     });
 });
