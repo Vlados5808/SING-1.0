@@ -6,23 +6,22 @@
   <title>Sign in</title>
   <link rel="stylesheet" href="style.css">
   <link href="https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-  <script src="script_toggle_password.js" ></script>
+  <script src="script_toggle_password.js"></script>
 </head>
 <body>
   <div class="container">
     <div class="logo">LOGO</div>
     <h1>Welcome to {{Platform name}}</h1>
     <h2>Sign in</h2>
-    <form action="#" method="" class="sing">
+    <form id="signInForm" class="sing" onsubmit="signIn(event)">
       <label for="email">Email</label>
-      <input type="email" class="email" id="email" name="email" >
+      <input type="email" class="email" id="email" name="email" required>
       <label for="password">Password</label>
-      <input type="password" id="password" class="password" name="password" >
+      <input type="password" id="password" class="password" name="password" required>
       <img src="images/eye-closed.png" id="eyes" onclick="togglePassword()"> 
       <button type="submit">Sign in</button>
     </form>
-    <p class="link">Don’t have account yet? <a href="Sing_up.html">Sign up</a>
-    </p>
+    <p class="link">Don’t have account yet? <a href="Sing_up.html">Sign up</a></p>
   </div>
   <script src="index.js"></script>
   <script src="console1.js"></script>
