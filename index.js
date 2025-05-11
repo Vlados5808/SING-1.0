@@ -6,12 +6,12 @@ const app = express();
 
 let users = [];
 let upgrades = [
-    { id: 1, name: "Click Accelerator", description: "Speed of earning x10", price: 40000 },
-    { id: 2, name: "Coin Multiplier", description: "ClickCoins per click x10", price: 40000 },
-    { id: 3, name: "Power Tap", description: "ClickCoins per click x2", price: 10000 },
-    { id: 4, name: "Golden Touch", description: "Random bonus on click", price: 40000 },
-    { id: 5, name: "Coin Stream", description: "Passive income x10", price: 40000 },
-    { id: 6, name: "Mining Drone", description: "Automated clicks for 1 min", price: 100000 }
+    { id: 1, name: "Click Accelerator", description: "Speed of earning x10", price: 40000, effect: { type: "multiplyClick", value: 10 } },
+    { id: 2, name: "Coin Multiplier", description: "ClickCoins per click x10", price: 40000, effect: { type: "multiplyClick", value: 10 } },
+    { id: 3, name: "Power Tap", description: "ClickCoins per click +2", price: 10000, effect: { type: "addClick", value: 2 } },
+    { id: 4, name: "Golden Touch", description: "Random bonus on click", price: 40000, effect: { type: "addClick", value: 5 } },
+    { id: 5, name: "Coin Stream", description: "Passive income x10", price: 40000, effect: { type: "multiplyPassive", value: 10 } },
+    { id: 6, name: "Mining Drone", description: "Automated clicks for 1 min", price: 100000, effect: { type: "addPassive", value: 5 } }
 ];
 
 app.use(cors());
@@ -40,7 +40,8 @@ app.post('/sign-up', (req, res) => {
         password: encodePassword(password),
         balance: 0,
         coinsPerClick: 1,
-        passiveIncomePerSecond: 0
+        passiveIncomePerSecond: 0,
+        upgrades: [] // Зберігаємо апгрейди для кожного користувача
     };
 
     users.push(newUser);
@@ -60,7 +61,8 @@ app.post('/sign-in', (req, res) => {
         email: user.email,
         balance: user.balance,
         coinsPerClick: user.coinsPerClick,
-        passiveIncomePerSecond: user.passiveIncomePerSecond
+        passiveIncomePerSecond: user.passiveIncomePerSecond,
+        upgrades: user.upgrades
     });
 });
 
@@ -75,7 +77,8 @@ app.get('/user/:id', (req, res) => {
         email: user.email,
         balance: user.balance,
         coinsPerClick: user.coinsPerClick,
-        passiveIncomePerSecond: user.passiveIncomePerSecond
+        passiveIncomePerSecond: user.passiveIncomePerSecond,
+        upgrades: user.upgrades
     });
 });
 
@@ -116,6 +119,65 @@ app.put('/update-balance', (req, res) => {
     res.status(200).json({ message: 'Balance updated successfully!', balance: user.balance });
 });
 
+// Покупка апгрейду
+app.post('/buy-upgrade', (req, res) => {
+    const { userId, upgradeId } = req.body;
+
+    // Знайти користувача
+    const user = users.find((u) => u.id === userId);
+    if (!user) {
+        return res.status(404).json({ message: 'User not found!' });
+    }
+
+    // Знайти апгрейд
+    const upgrade = upgrades.find((u) => u.id === upgradeId);
+    if (!upgrade) {
+        return res.status(404).json({ message: 'Upgrade not found!' });
+    }
+
+    // Перевірити баланс користувача
+    if (user.balance < upgrade.price) {
+        return res.status(400).json({ message: 'Insufficient funds!' });
+    }
+
+    // Застосувати ефект апгрейду
+    try {
+        switch (upgrade.effect.type) {
+            case 'multiplyClick':
+                user.coinsPerClick *= upgrade.effect.value;
+                break;
+            case 'addClick':
+                user.coinsPerClick += upgrade.effect.value;
+                break;
+            case 'multiplyPassive':
+                user.passiveIncomePerSecond *= upgrade.effect.value;
+                break;
+            case 'addPassive':
+                user.passiveIncomePerSecond += upgrade.effect.value;
+                break;
+            default:
+                return res.status(409).json({ message: 'Effect not supported!' });
+        }
+
+        // Зняти монети з балансу
+        user.balance -= upgrade.price;
+        if (!user.upgrades.includes(upgradeId)) {
+            user.upgrades.push(upgradeId);
+        }
+
+        res.status(200).json({
+            message: 'Upgrade purchased successfully!',
+            balance: user.balance,
+            coinsPerClick: user.coinsPerClick,
+            passiveIncomePerSecond: user.passiveIncomePerSecond,
+            upgrades: user.upgrades
+        });
+    } catch (error) {
+        console.error('Error applying upgrade effect:', error);
+        res.status(500).json({ message: 'Internal server error!' });
+    }
+});
+
 // Отримати апгрейди
 app.get('/upgrades', (req, res) => {
     res.status(200).json(upgrades);
@@ -127,46 +189,6 @@ app.get('/upgrades/:id', (req, res) => {
         return res.status(404).json({ message: 'Upgrade not found!' });
     }
     res.status(200).json(upgrade);
-});
-
-app.post('/upgrades', (req, res) => {
-    const { id, name, description, price } = req.body;
-
-    if (!id || !name || !description || !price) {
-        return res.status(400).json({ message: 'All fields are required!' });
-    }
-
-    if (upgrades.find((u) => u.id === id)) {
-        return res.status(409).json({ message: 'Upgrade with this ID already exists!' });
-    }
-
-    const newUpgrade = { id, name, description, price };
-    upgrades.push(newUpgrade);
-    res.status(201).json({ message: 'Upgrade added successfully!', upgrade: newUpgrade });
-});
-
-app.put('/upgrades/:id', (req, res) => {
-    const { name, description, price } = req.body;
-    const upgrade = upgrades.find((u) => u.id === parseInt(req.params.id));
-
-    if (!upgrade) {
-        return res.status(404).json({ message: 'Upgrade not found!' });
-    }
-
-    if (name) upgrade.name = name;
-    if (description) upgrade.description = description;
-    if (price) upgrade.price = price;
-
-    res.status(200).json({ message: 'Upgrade updated successfully!', upgrade });
-});
-
-app.delete('/upgrades/:id', (req, res) => {
-    const index = upgrades.findIndex((u) => u.id === parseInt(req.params.id));
-    if (index === -1) {
-        return res.status(404).json({ message: 'Upgrade not found!' });
-    }
-    upgrades.splice(index, 1);
-    res.status(204).send();
 });
 
 app.listen(3000, () => {
