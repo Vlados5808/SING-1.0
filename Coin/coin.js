@@ -9,16 +9,25 @@ document.addEventListener('DOMContentLoaded', () => {
     fetch(`http://localhost:3000/user/${userId}`)
         .then(res => res.json())
         .then(data => {
-            // Устанавливаем баланс и totalClickCoins из данных пользователя
             document.querySelector('#coins').textContent = data.balance;
             coins = data.balance;
 
-            totalClickCoins = data.totalClickCoins || 0; // Если totalClickCoins отсутствует, устанавливаем 0
+            totalClickCoins = data.totalClickCoins || 0; 
             document.querySelector('#totalClickCoins').textContent = totalClickCoins;
 
             // Устанавливаем никнейм пользователя
             const usernameElement = document.getElementById('username');
-            usernameElement.textContent = data.email; // Используем email как никнейм
+            usernameElement.textContent = data.email; 
+
+            // Применяем сохраненные апгрейды
+            if (data.upgrades && Array.isArray(data.upgrades)) {
+                data.upgrades.forEach((upgradeId) => {
+                    const upgrade = getUpgradeById(upgradeId);
+                    if (upgrade) {
+                        applyUpgradeEffect(upgrade);
+                    }
+                });
+            }
         })
         .catch(err => {
             console.error('Error fetching user data:', err);
@@ -30,6 +39,7 @@ let coins = 0;
 let totalClickCoins = 0;
 let coinsPerClick = 1;
 let passiveIncomePerSecond = 1;
+let passiveIncomeInterval;
 
 document.addEventListener('DOMContentLoaded', () => {
     const clickCoin = document.getElementById('clickCoin');
@@ -64,6 +74,29 @@ document.addEventListener('DOMContentLoaded', () => {
         totalClickCoinsElement.textContent = totalClickCoins.toLocaleString();
     };
 
+    // Функция для запуска пассивного дохода
+    const startPassiveIncome = () => {
+
+        passiveIncomeInterval = setInterval(() => {
+            coins += passiveIncomePerSecond;
+            totalClickCoins += passiveIncomePerSecond; 
+
+            updateBalance();
+
+            const userId = localStorage.getItem('userId');
+            fetch('http://localhost:3000/passive-income', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: userId, totalClickCoins }) 
+            });
+
+            updateBalanceOnServer();
+        }, 1000);
+    };
+
+
+    startPassiveIncome();
+
     // Обработка клика по монете
     clickCoin.addEventListener('click', () => {
         coins += coinsPerClick;
@@ -84,23 +117,6 @@ document.addEventListener('DOMContentLoaded', () => {
         randomSound.play();
     });
 
-    // Автоматическое добавление пассивного дохода
-    setInterval(() => {
-        coins += passiveIncomePerSecond;
-        totalClickCoins += passiveIncomePerSecond; // Увеличиваем totalClickCoins для автоматических кликов
-
-        updateBalance();
-
-        const userId = localStorage.getItem('userId');
-        fetch('http://localhost:3000/passive-income', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: userId, totalClickCoins }) // Отправляем totalClickCoins на сервер
-        });
-
-        updateBalanceOnServer();
-    }, 1000);
-
     // Обработка покупки апгрейдов
     document.querySelectorAll('.upgrade-card-button').forEach((button, index) => {
         button.addEventListener('click', () => {
@@ -119,13 +135,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     return res.json();
                 })
                 .then((data) => {
-                    alert('Upgrade purchased successfully!');
+                    console.log('Upgrade purchased successfully!');
 
                     // Обновление данных пользователя
                     localStorage.setItem('coins', data.balance);
                     localStorage.setItem('coinsPerClick', data.coinsPerClick);
                     localStorage.setItem('passiveIncomePerSecond', data.passiveIncomePerSecond);
-                    localStorage.setItem('upgrades', JSON.stringify(data.upgrades));
+                    localStorage.setItem('upgrades', JSON.stringify(data.upgrades)); // Сохраняем апгрейды
 
                     // Обновление отображения
                     coins = data.balance;
@@ -133,18 +149,45 @@ document.addEventListener('DOMContentLoaded', () => {
                     passiveIncomePerSecond = data.passiveIncomePerSecond;
 
                     updateBalance();
+
+                    // Перезапускаем пассивный доход
+                    startPassiveIncome();
                 })
                 .catch((err) => {
-                    if (err.status === 404) {
-                        alert('User or upgrade not found!');
-                    } else if (err.status === 400) {
-                        alert('Insufficient funds!');
-                    } else if (err.status === 409) {
-                        alert('Effect not supported!');
-                    } else {
-                        alert('An error occurred. Please try again.');
-                    }
+                    console.error('Error purchasing upgrade:', err);
                 });
         });
     });
 });
+
+// Функция для получения апгрейда по ID
+const getUpgradeById = (id) => {
+    const upgrades = [
+        { id: 1, effect: { type: "multiplyClick", value: 10 } },
+        { id: 2, effect: { type: "multiplyClick", value: 10 } },
+        { id: 3, effect: { type: "addClick", value: 2 } },
+        { id: 4, effect: { type: "addClick", value: 5 } },
+        { id: 5, effect: { type: "multiplyPassive", value: 10 } },
+        { id: 6, effect: { type: "addPassive", value: 5 } }
+    ];
+    return upgrades.find(upgrade => upgrade.id === id);
+};
+
+const applyUpgradeEffect = (upgrade) => {
+    switch (upgrade.effect.type) {
+        case 'multiplyClick':
+            coinsPerClick *= upgrade.effect.value;
+            break;
+        case 'addClick':
+            coinsPerClick += upgrade.effect.value;
+            break;
+        case 'multiplyPassive':
+            passiveIncomePerSecond *= upgrade.effect.value;
+            break;
+        case 'addPassive':
+            passiveIncomePerSecond += upgrade.effect.value;
+            break;
+        default:
+            console.warn('Unknown upgrade effect:', upgrade.effect.type);
+    }
+};
