@@ -38,7 +38,7 @@ app.post('/sign-up', (req, res) => {
         id: generateUniqueId(),
         email,
         password: encodePassword(password),
-        balance: 0,
+        balance: 10000000,
         coinsPerClick: 1,
         passiveIncomePerSecond: 0,
         upgrades: [] // Зберігаємо апгрейди для кожного користувача
@@ -119,7 +119,7 @@ app.put('/update-balance', (req, res) => {
     res.status(200).json({ message: 'Balance updated successfully!', balance: user.balance });
 });
 
-// Покупка апгрейду
+// Покупка апгрейда
 app.post('/buy-upgrade', (req, res) => {
     const { userId, upgradeId } = req.body;
 
